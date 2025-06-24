@@ -1,5 +1,6 @@
 using Dapr.Client;
 using dapr_webapi;
+using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using System.Diagnostics;
 using System.Text.Json;
@@ -21,9 +22,19 @@ var jsonOpt = new JsonSerializerOptions()
 Process[] processes = Process.GetProcessesByName("daprd");
 if (!processes.Any(p => p.GetCommandLineArgs().Contains($" {SELF_APP_ID} ")))
 {
+    // 获取应用程序基目录，确保components路径正确
+    var baseDirectory = AppContext.BaseDirectory;
+    var componentsPath = Path.Combine(baseDirectory, "components");
+    Process.Start(new ProcessStartInfo
+    {
+        FileName = "C:\\dapr\\dapr.exe",
+        Arguments = $"run --app-id {SELF_APP_ID} --app-port \"6001\" --dapr-http-port \"6010\" --dapr-grpc-port \"50001\" --resources-path \"{componentsPath}\"",
+        WorkingDirectory = baseDirectory
+    });
+
     //dapr run --app-id "mywebapi" --app-port "6000" --dapr-http-port "6010" -- dotnet run --project ./dapr-webapi.csproj --urls="http://+:6000"
     // 这里的 Process.Start 需要确保 daprd.exe 的路径正确
-    Process.Start("C:\\dapr\\dapr.exe", $"run --app-id {SELF_APP_ID} --app-port \"6001\" --dapr-http-port \"6010\" ");
+    //Process.Start("C:\\dapr\\dapr.exe", $"run --app-id {SELF_APP_ID} --app-port \"6001\" --dapr-http-port \"6010\" --resources-path ./components ");
 }
 
 builder.Services.AddDaprClient(opt =>
@@ -73,6 +84,27 @@ app.MapGet("/hello", async (string value, DaprClient daprClient) =>
     var response = await daprClient.InvokeMethodWithResponseAsync(request);
     return $"Hello from Dapr + Minimal API! : {await response.Content.ReadAsStringAsync()}";
     #endregion
+});
+
+//在这里引入Dapr StateManagement 示例
+app.MapGet("/state/{key}", async ([FromRoute]string key, DaprClient daprClient) =>
+{
+    try
+    {
+        var state = await daprClient.GetStateAsync<string>("mywebapi", key);
+        return state ?? "State not found";
+    }
+    catch (Exception e)
+    {
+
+        throw;
+    }
+});
+
+app.MapPost("/state/{key}", async ([FromRoute] string key, string value, DaprClient daprClient) =>
+{
+    await daprClient.SaveStateAsync("mywebapi", key, value);
+    return Results.Ok($"State saved: {key} = {value}");
 });
 
 if (app.Environment.IsDevelopment())
