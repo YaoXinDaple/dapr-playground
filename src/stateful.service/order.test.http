@@ -1,0 +1,52 @@
+@baseUrl = localhost
+@orderservicePort = 5001
+@orderserviceDaprPort = 5010
+###
+# @name simpleOrderRequest
+POST http://{{baseUrl}}:{{orderservicePort}}/order
+content-type: application/json
+
+{
+  "CustomerCode": "Davide",
+  "Date": "2025-06-23",
+  "Items": [
+    {
+      "ProductCode": "cookie4",
+      "Quantity": 7
+    },
+    {
+      "ProductCode": "bussola1",
+      "Quantity": 6
+    }
+  ]
+}
+###
+
+@orderId = {{simpleOrderRequest.response.body.$}}
+GET http://{{baseUrl}}:{{orderservicePort}}/order/{{orderId}}
+###
+GET http://{{baseUrl}}:{{orderserviceDaprPort}}/v1.0/state/orderstore/{{orderId}}
+###
+@reservationservicePort = 5002
+@reservationserviceDaprPort = 5020
+###
+POST http://{{baseUrl}}:{{reservationservicePort}}/reserve 
+content-type: application/json
+
+{
+    "SKU": "cookie2",
+    "Quantity": 4
+}
+###
+POST http://{{baseUrl}}:{{reservationserviceDaprPort}}/v1.0/invoke/reservation-service/method/reserve 
+content-type: application/json
+
+{
+    "SKU": "cookie2",
+    "Quantity": 4
+}
+###
+GET http://{{baseUrl}}:{{reservationserviceDaprPort}}/v1.0/state/reservationstore/cookie2  
+###
+GET http://{{baseUrl}}:{{reservationservicePort}}/balance/cookie2 
+###

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "sample.microservice.order": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:37060;http://localhost:37061"
+    }
+  }
+}
