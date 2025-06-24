@@ -21,12 +21,16 @@ public class OrderController : ControllerBase
         var state = await daprClient.GetStateEntryAsync<OrderState>(StoreName, order.Id.ToString());
         state.Value ??= new OrderState() { CreatedOn = DateTime.UtcNow, UpdatedOn = DateTime.UtcNow, Order = order };
         
+        Console.WriteLine($"Current order {state.Value.Order.Id} for customer {state.Value.Order.CustomerCode}");
+
         foreach (var item in order.Items)
         {
             var data = new Item() { SKU = item.ProductCode, Quantity = item.Quantity };
             var result = await daprClient.InvokeMethodAsync<Item, Item>(HttpMethod.Post, "reservation-service", "reserve", data);
         }
-        
+
+        Console.WriteLine($"Order {order.Id} for customer {order.CustomerCode} has been processed.");
+
         await state.SaveAsync();
 
         Console.WriteLine($"Submitted order {order.Id}");

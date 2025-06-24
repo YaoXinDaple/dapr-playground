@@ -19,6 +19,8 @@ public class ReservationController : ControllerBase
         var state = await daprClient.GetStateEntryAsync<ItemState>(StoreName, reservation.SKU);
         state.Value ??= new ItemState() { SKU = reservation.SKU, Changes = new List<ItemReservation>() };
 
+        Console.WriteLine($"Current balance for {state.Value.SKU} is {state.Value.BalanceQuantity}");
+
         // update balance
         state.Value.BalanceQuantity -= reservation.Quantity;
 
