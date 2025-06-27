@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "新建配置文件",
+    "Projects": [
+      {
+        "Path": "src\\stateful.service\\sample.microservice.order\\sample.microservice.order.csproj",
+        "Action": "Start",
+        "DebugTarget": "sample.microservice.order"
+      },
+      {
+        "Path": "src\\stateful.service\\sample.microservice.reservation\\sample.microservice.reservation.csproj",
+        "Action": "Start",
+        "DebugTarget": "sample.microservice.reservation"
+      }
+    ]
+  }
+]

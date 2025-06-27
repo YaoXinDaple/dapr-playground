@@ -1,0 +1,6 @@
+@dapr.rpa.api_HostAddress = http://localhost:5126
+
+GET {{dapr.rpa.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

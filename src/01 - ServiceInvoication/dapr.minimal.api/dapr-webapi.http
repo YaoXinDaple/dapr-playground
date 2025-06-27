@@ -1,0 +1,6 @@
+@dapr.minimalApi_HostAddress = http://localhost:5187
+
+GET {{dapr.minimalApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
