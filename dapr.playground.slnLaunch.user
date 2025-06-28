@@ -3,14 +3,12 @@
     "Name": "新建配置文件",
     "Projects": [
       {
-        "Path": "src\\stateful.service\\sample.microservice.order\\sample.microservice.order.csproj",
-        "Action": "Start",
-        "DebugTarget": "sample.microservice.order"
+        "Path": "src\\02 - StateManagement\\dapr.rpa.api\\dapr.rpa.api.csproj",
+        "Action": "Start"
       },
       {
-        "Path": "src\\stateful.service\\sample.microservice.reservation\\sample.microservice.reservation.csproj",
-        "Action": "Start",
-        "DebugTarget": "sample.microservice.reservation"
+        "Path": "src\\02 - StateManagement\\dapr.invoiceApi\\dapr.invoiceApi.csproj",
+        "Action": "Start"
       }
     ]
   }

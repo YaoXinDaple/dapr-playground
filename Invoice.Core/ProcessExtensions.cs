@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Management;
 
-namespace dapr.invoiceApi
+namespace Invoice.Core
 {
     public static class ProcessExtensions
     {

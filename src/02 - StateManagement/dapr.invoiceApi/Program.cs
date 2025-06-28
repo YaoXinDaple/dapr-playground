@@ -1,14 +1,17 @@
+using dapr.invoiceApi.contract.InvoiceDto;
+using dapr.minimalApi.Domain;
+using dapr.rpa.api.contract;
 using Dapr.Client;
-using dapr.invoiceApi;
+using Invoice.Core;
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using System.Diagnostics;
 using System.Text.Json;
 
-const string SELF_APP_ID = "mywebapi";
+const string SELF_APP_ID = "invoiceapi";
 
-const string HELLO_WORLD_API_ID = "hello-world";
-const string HELLO_WORLD_METHOD_HELLO = "hello";
+const string RPA_API_ID = "rpaclient";
+const string RPA_METHOD_ACCEPT = "accept";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,51 +63,57 @@ var app = builder.Build();
 // 使用 Minimal API 风格注册路由（自动包含 UseRouting）
 app.MapSubscribeHandler();
 
-app.MapGet("/hello", async (string value, DaprClient daprClient) =>
+
+app.MapPost("/task", async ([FromBody] InvoiceTask taskDataRequest, [FromServices] DaprClient daprClient) =>
 {
+    TaskData task = new TaskData
+    {
+        Buyer = taskDataRequest.Buyer,
+        BuyerUscc = taskDataRequest.BuyerUscc,
+        Seller = taskDataRequest.Seller,
+        SellerUscc = taskDataRequest.SellerUscc,
+        Amount = taskDataRequest.Amount
+    };
+    await daprClient.SaveStateAsync(SELF_APP_ID, task.Id.ToString(), task);
 
-    #region 第一种方式 CreateHttpClient
-    /*
-    var client = DaprClient.CreateInvokeHttpClient(appId: HELLO_WORLD_APP_ID);
-    var response = await client.GetAsync($"/{HELLO_WORLD_METHOD_HELLO}?value={value}");
-    return $"Hello from Dapr + Minimal API! : {await response.Content.ReadAsStringAsync()}";
-    */
-    #endregion
+    RpaTaskDto dto = new RpaTaskDto
+    {
+        TaskId = task.Id,
+        BuyerUscc = task.BuyerUscc,
+        SellerUscc = task.SellerUscc,
+        Amount = task.Amount
+    };
 
-    #region 第二种方式 使用注入的 DaprClient CreateInvokeMethod
     var request = daprClient.CreateInvokeMethodRequest(
-        HttpMethod.Get,
-        appId: HELLO_WORLD_API_ID,
-        methodName: HELLO_WORLD_METHOD_HELLO,
-        new Dictionary<string, string>
-        {
-            { "value",value} // key=value 格式
-        });
+        HttpMethod.Post,
+        appId: RPA_API_ID,
+        methodName: RPA_METHOD_ACCEPT,
+        null,
+        dto);
 
     var response = await daprClient.InvokeMethodWithResponseAsync(request);
-    return $"Hello from Dapr + Minimal API! : {await response.Content.ReadAsStringAsync()}";
-    #endregion
+    response.EnsureSuccessStatusCode();
+    task.StartedAt = DateTimeOffset.UtcNow;
+
+    return Results.Accepted(task.Id.ToString());
 });
 
-//在这里引入Dapr StateManagement 示例
-app.MapGet("/state/{key}", async ([FromRoute]string key, DaprClient daprClient) =>
+app.MapPut("/accept/{id}", async (Guid id, [FromServices] DaprClient daprClient) =>
 {
-    try
-    {
-        var state = await daprClient.GetStateAsync<string>("mywebapi", key);
-        return state ?? "State not found";
-    }
-    catch (Exception e)
-    {
+    TaskData data = await daprClient.GetStateAsync<TaskData>(SELF_APP_ID, id.ToString());
+    data.StartedAt = DateTimeOffset.UtcNow;
 
-        throw;
-    }
+    await daprClient.SaveStateAsync(SELF_APP_ID, data.Id.ToString(), data);
+    return Results.Ok();
 });
 
-app.MapPost("/state/{key}", async ([FromRoute] string key, string value, DaprClient daprClient) =>
+app.MapPut("/complete/{id}", async (Guid id, [FromServices] DaprClient daprClient) =>
 {
-    await daprClient.SaveStateAsync("mywebapi", key, value);
-    return Results.Ok($"State saved: {key} = {value}");
+    TaskData data = await daprClient.GetStateAsync<TaskData>(SELF_APP_ID, id.ToString());
+    data.CompletedAt = DateTimeOffset.UtcNow;
+
+    await daprClient.SaveStateAsync(SELF_APP_ID, data.Id.ToString(), data);
+    return Results.Ok();
 });
 
 if (app.Environment.IsDevelopment())

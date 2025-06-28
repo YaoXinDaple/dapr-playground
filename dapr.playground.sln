@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dapr.invoiceApi.contract", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dapr.rpa.api.contract", "src\02 - StateManagement\dapr.rpa.api.contract\dapr.rpa.api.contract.csproj", "{AAA58C84-BF01-4290-B5A7-C3AA97A8F47D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoice.Core", "Invoice.Core\Invoice.Core.csproj", "{997EC61A-99CD-484B-A8F6-DB0C38563820}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{AAA58C84-BF01-4290-B5A7-C3AA97A8F47D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAA58C84-BF01-4290-B5A7-C3AA97A8F47D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAA58C84-BF01-4290-B5A7-C3AA97A8F47D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{997EC61A-99CD-484B-A8F6-DB0C38563820}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{997EC61A-99CD-484B-A8F6-DB0C38563820}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{997EC61A-99CD-484B-A8F6-DB0C38563820}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{997EC61A-99CD-484B-A8F6-DB0C38563820}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{605819D0-C692-180E-6B77-342EF0B71E78} = {0A47E91B-1FC2-4AD2-B478-D8FE71D3A56C}
 		{8FA6B85C-4DFB-C436-F544-848B5C94F522} = {0A47E91B-1FC2-4AD2-B478-D8FE71D3A56C}
 		{AAA58C84-BF01-4290-B5A7-C3AA97A8F47D} = {0A47E91B-1FC2-4AD2-B478-D8FE71D3A56C}
+		{997EC61A-99CD-484B-A8F6-DB0C38563820} = {0A47E91B-1FC2-4AD2-B478-D8FE71D3A56C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65AEC7C9-4F7C-4CFF-B61E-7B84851C02D9}

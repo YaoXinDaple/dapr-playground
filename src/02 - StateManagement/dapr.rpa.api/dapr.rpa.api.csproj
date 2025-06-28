@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,7 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
+	  <PackageReference Include="Dapr.AspNetCore" Version="1.15.4" />
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
+	  <PackageReference Include="Scalar.AspNetCore" Version="2.5.0" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Invoice.Core\Invoice.Core.csproj" />
+    <ProjectReference Include="..\dapr.invoiceApi.contract\dapr.invoiceApi.contract.csproj" />
+    <ProjectReference Include="..\dapr.rpa.api.contract\dapr.rpa.api.contract.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="components\statestore.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
