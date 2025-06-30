@@ -1,0 +1,6 @@
+@dapr.invoiceApi_HostAddress = http://localhost:5187
+
+GET {{dapr.invoiceApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
