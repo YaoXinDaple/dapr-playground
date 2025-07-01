@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Rpa.Client.Interfaces\Rpa.Client.Interfaces.csproj" />
     <ProjectReference Include="..\..\Invoice.Core\Invoice.Core.csproj" />
+    <ProjectReference Include="..\Rpa.Client.Interfaces\Rpa.Client.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
