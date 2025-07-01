@@ -1,41 +1,48 @@
+using Dapr;
+using Invoice.Core;
+using Scalar.AspNetCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var jsonOpt = new JsonSerializerOptions()
+{
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    PropertyNameCaseInsensitive = true,
+    // 添加这两行
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+};
+
+// 添加 Dapr 客户端支持（如果需要调用其他服务或操作状态）
+builder.Services.AddDaprClient(opt =>
+{
+    opt.UseJsonSerializationOptions(jsonOpt);
+});
+
 builder.Services.AddOpenApi();
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 使用 Minimal API 风格注册路由（自动包含 UseRouting）
+app.MapSubscribeHandler();
+
+app.MapPost("/complete", [Topic("invoiceapi-pubsub", "invoices")] (CloudEvent<InvoiceData> cloudEvent) =>
+{
+    var invoice = cloudEvent.Data;
+    //Console.WriteLine($"Received cloud event: {JsonSerializer.Serialize(cloudEvent, jsonOpt)}");
+    Console.WriteLine($"Invoice Id:{invoice.InvoiceId} has been processed by rpa server");
+    return Results.Ok(invoice);
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
 
 app.Run();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
